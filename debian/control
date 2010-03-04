@@ -1,0 +1,23 @@
+Source: mafw-grilo-source
+Section: misc
+Priority: optional
+Maintainer: Xabier Rodriguez Calvar <xrcalvar@igalia.com>
+Build-Depends: debhelper (>= 4.0.0),
+	       libglib2.0-dev, libmafw0-dev
+Standards-Version: 3.7.2
+
+Package: mafw-grilo-source
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: MAFW Grilo source plugin
+ This MAFW plugin provides all contents gathered by Grilo with MAFW
+ interface.
+
+Package: mafw-grilo-source-dbg
+Section: devel
+Architecture: any
+Priority: extra
+Depends: mafw-grilo-source (= ${binary:Version})
+Description: debug symbols for mafw-grilo-source
+ MAFW-Grilo-source debug symbols.
