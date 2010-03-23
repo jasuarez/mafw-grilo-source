@@ -37,7 +37,7 @@ AC_SUBST(GLIB_GENMARSHAL)
 
 AC_SUBST([_CFLAGS])
 AC_SUBST([_LDFLAGS])
-_CFLAGS="-Wall -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations -g3"
+_CFLAGS="-Wall -Werror -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations -g3"
 
 dnl Output files.
 
