@@ -83,15 +83,10 @@ G_MODULE_EXPORT MafwPluginDescriptor mafw_grilo_source_plugin_description = {
 gboolean mafw_grilo_source_initialize(MafwRegistry *registry,
                                       GError **error)
 {
-  MafwGriloSource *source;
-
   g_debug("Mafw Grilo plugin initializing");
 
   g_assert (!plugin.registry);
   plugin.registry = g_object_ref(registry);
-
-  source = mafw_grilo_source_new();
-  mafw_registry_add_extension(registry, MAFW_EXTENSION(source));
 
   return TRUE;
 }
