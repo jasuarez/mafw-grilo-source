@@ -47,7 +47,7 @@ struct _MafwGriloSourcePrivate
 
 typedef struct
 {
-  MafwRegistry* registry;
+  GSList *grl_sources;
 } MafwGriloSourcePlugin;
 
 static MafwGriloSourcePlugin plugin = { NULL };
@@ -91,14 +91,63 @@ G_MODULE_EXPORT MafwPluginDescriptor mafw_grilo_source_plugin_description = {
   .deinitialize = mafw_grilo_source_deinitialize,
 };
 
+
+static void
+source_added_cb (GrlPluginRegistry *grl_registry, gpointer user_data)
+{
+  GrlSupportedOps supported_ops;
+  MafwGriloSource *mafw_grilo_source;
+  MafwRegistry *mafw_registry;
+
+  /* Only sources that implement browse and metadata are of interest */
+  supported_ops =
+    grl_metadata_source_supported_operations (GRL_METADATA_SOURCE (user_data));
+  if (!(supported_ops & GRL_OP_BROWSE &&
+        supported_ops & GRL_OP_METADATA))
+    {
+      return;
+    }
+
+  mafw_grilo_source = mafw_grilo_source_new (GRL_MEDIA_PLUGIN (user_data));
+  plugin.grl_sources =
+    g_slist_prepend (plugin.grl_sources, mafw_grilo_source);
+
+  mafw_registry = mafw_registry_get_instance ();
+  mafw_registry_add_extension (mafw_registry,
+                               MAFW_EXTENSION (mafw_grilo_source));
+}
+
+static void
+source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
+{
+  GSList *link;
+
+  link = g_slist_find (plugin.grl_sources, user_data);
+
+  if (link)
+    {
+      g_object_unref (link->data);
+      plugin.grl_sources =
+        g_slist_remove_link (plugin.grl_sources, link);
+    }
+}
+
 static gboolean
 mafw_grilo_source_initialize (MafwRegistry *mafw_registry,
                               GError **error)
 {
-  g_debug("Mafw Grilo plugin initializing");
+  GrlPluginRegistry *grl_registry;
 
-  g_assert (!plugin.registry);
-  plugin.registry = g_object_ref(registry);
+  g_debug ("Mafw Grilo plugin initializing");
+
+  grl_registry = grl_plugin_registry_get_instance ();
+
+  g_signal_connect (grl_registry, "source-added",
+                    G_CALLBACK (source_added_cb), NULL);
+  g_signal_connect (grl_registry, "source-removed",
+                    G_CALLBACK (source_removed_cb), NULL);
+
+  grl_plugin_registry_load_all (grl_registry);
 
   return TRUE;
 }
@@ -106,9 +155,9 @@ mafw_grilo_source_initialize (MafwRegistry *mafw_registry,
 static void
 mafw_grilo_source_deinitialize (GError **error)
 {
-  g_assert (plugin.registry);
-  g_object_unref (plugin.registry);
-  plugin.registry = NULL;
+  g_slist_foreach (plugin.grl_sources, (GFunc) g_object_unref, NULL);
+  g_slist_free (plugin.grl_sources);
+  plugin.grl_sources = NULL;
 }
 
 static void
