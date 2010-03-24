@@ -75,6 +75,9 @@ static void mafw_grilo_source_get_metadata (MafwSource *source,
                                             const gchar *const *metadata_keys,
                                             MafwSourceMetadataResultCb cb,
                                             gpointer user_data);
+static gboolean mafw_grilo_source_initialize (MafwRegistry *mafw_registry,
+                                              GError **error);
+static void mafw_grilo_source_deinitialize (GError **error);
 
 
 G_MODULE_EXPORT MafwPluginDescriptor mafw_grilo_source_plugin_description = {
@@ -83,8 +86,9 @@ G_MODULE_EXPORT MafwPluginDescriptor mafw_grilo_source_plugin_description = {
   .deinitialize = mafw_grilo_source_deinitialize,
 };
 
-gboolean mafw_grilo_source_initialize(MafwRegistry *registry,
-                                      GError **error)
+static gboolean
+mafw_grilo_source_initialize (MafwRegistry *mafw_registry,
+                              GError **error)
 {
   g_debug("Mafw Grilo plugin initializing");
 
@@ -94,7 +98,8 @@ gboolean mafw_grilo_source_initialize(MafwRegistry *registry,
   return TRUE;
 }
 
-void mafw_grilo_source_deinitialize(GError **error)
+static void
+mafw_grilo_source_deinitialize (GError **error)
 {
   g_assert (plugin.registry);
   g_object_unref (plugin.registry);
@@ -128,11 +133,9 @@ mafw_grilo_source_class_init (MafwGriloSourceClass *klass)
   source_class->get_metadata = mafw_grilo_source_get_metadata;
 }
 
-/*----------------------------------------------------------------------------
-  Public API
-  ----------------------------------------------------------------------------*/
 
-MafwGriloSource *mafw_grilo_source_new(void)
+static MafwGriloSource *
+mafw_grilo_source_new (GrlMediaPlugin *grl_plugin)
 {
   return g_object_new(MAFW_TYPE_GRILO_SOURCE,
                       "plugin", MAFW_GRILO_SOURCE_PLUGIN_NAME,
@@ -140,6 +143,10 @@ MafwGriloSource *mafw_grilo_source_new(void)
                       "name", MAFW_GRILO_SOURCE_NAME,
                       NULL);
 }
+
+/*----------------------------------------------------------------------------
+  Public API
+  ----------------------------------------------------------------------------*/
 
 static guint
 mafw_grilo_source_browse (MafwSource *source,

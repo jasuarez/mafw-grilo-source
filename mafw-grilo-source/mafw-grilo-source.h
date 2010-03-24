@@ -62,11 +62,6 @@ struct _MafwGriloSourceClass {
 	MafwSourceClass parent_class;
 };
 
-gboolean mafw_grilo_source_initialize(MafwRegistry *registry,
-                                      GError **error);
-void mafw_grilo_source_deinitialize(GError **error);
-
-MafwGriloSource *mafw_grilo_source_new(void);
 GType mafw_grilo_source_get_type(void);
 
 G_END_DECLS
