@@ -26,12 +26,11 @@
 #include <gmodule.h>
 
 #include <libmafw/mafw.h>
+#include <grilo.h>
 
 #include "mafw-grilo-source.h"
 
 #define MAFW_GRILO_SOURCE_PLUGIN_NAME "MAFW-Grilo-Source"
-#define MAFW_GRILO_SOURCE_NAME "MAFW Grilo source"
-#define MAFW_GRILO_SOURCE_UUID "grilo"
 
 
 G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
@@ -42,7 +41,7 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 
 struct _MafwGriloSourcePrivate
 {
-  gint foo;
+  GrlMediaPlugin *grl_source;
 };
 
 typedef struct
@@ -52,6 +51,12 @@ typedef struct
 } MafwGriloSourcePlugin;
 
 static MafwGriloSourcePlugin plugin = { NULL, 0 };
+
+enum
+  {
+    PROP_GRILO_PLUGIN = 1,
+  };
+
 static void mafw_grilo_source_init (MafwGriloSource* self);
 static void mafw_grilo_source_class_init (MafwGriloSourceClass* klass);
 static MafwGriloSource *mafw_grilo_source_new (GrlMediaPlugin *grl_plugin);
@@ -113,6 +118,26 @@ mafw_grilo_source_init (MafwGriloSource *self)
 
   g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
   priv = self->priv = MAFW_GRILO_SOURCE_GET_PRIVATE (self);
+  priv->grl_source = NULL;
+}
+
+static void
+set_property (GObject *gobject, guint prop_id,
+              const GValue *value, GParamSpec *pspec)
+{
+  MafwGriloSource *source = MAFW_GRILO_SOURCE (gobject);
+
+  switch (prop_id)
+    {
+    case PROP_GRILO_PLUGIN:
+      /* Construct-only */
+      g_assert (source->priv->grl_source == NULL);
+      source->priv->grl_source = g_value_dup_object (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (source, prop_id, pspec);
+      break;
+    }
 }
 
 static void
@@ -131,17 +156,52 @@ mafw_grilo_source_class_init (MafwGriloSourceClass *klass)
   source_class->browse = mafw_grilo_source_browse;
   source_class->cancel_browse = mafw_grilo_source_cancel_browse;
   source_class->get_metadata = mafw_grilo_source_get_metadata;
+
+  gobject_class->set_property = set_property;
+
+  g_object_class_install_property (gobject_class, PROP_GRILO_PLUGIN,
+                                   g_param_spec_object ("grl-plugin",
+                                                        "Grilo Plugin",
+                                                        "The Grilo plugin "
+                                                        "object",
+                                                        GRL_TYPE_MEDIA_PLUGIN,
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS |
+                                                        G_PARAM_WRITABLE));
 }
 
+static void
+sanitize (gchar *string)
+{
+  gint i;
+  g_return_if_fail (string);
+
+  i=0;
+  while (string[i]) {
+    switch (string[i]) {
+    case '-':
+    case ':':
+      string[i] = '_';
+    break;
+    }
+    i++;
+  }
+}
 
 static MafwGriloSource *
 mafw_grilo_source_new (GrlMediaPlugin *grl_plugin)
 {
-  return g_object_new(MAFW_TYPE_GRILO_SOURCE,
-                      "plugin", MAFW_GRILO_SOURCE_PLUGIN_NAME,
-                      "uuid", MAFW_GRILO_SOURCE_UUID,
-                      "name", MAFW_GRILO_SOURCE_NAME,
-                      NULL);
+  gchar *uuid;
+
+  uuid = g_strdup (grl_media_plugin_get_id (grl_plugin));
+  sanitize (uuid);
+
+  return g_object_new (MAFW_TYPE_GRILO_SOURCE,
+                       "plugin", MAFW_GRILO_SOURCE_PLUGIN_NAME,
+                       "uuid", uuid,
+                       "name", grl_media_plugin_get_name (grl_plugin),
+                       "grl-plugin", grl_plugin,
+                       NULL);
 }
 
 /*----------------------------------------------------------------------------
