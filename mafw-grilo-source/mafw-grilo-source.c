@@ -34,45 +34,48 @@
 #define MAFW_GRILO_SOURCE_UUID "grilo"
 
 
-G_DEFINE_TYPE(MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
+G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 
 #define MAFW_GRILO_SOURCE_GET_PRIVATE(object)				\
   (G_TYPE_INSTANCE_GET_PRIVATE ((object), MAFW_TYPE_GRILO_SOURCE,	\
                                 MafwGriloSourcePrivate))
 
-struct _MafwGriloSourcePrivate {
+struct _MafwGriloSourcePrivate
+{
   gint foo;
 };
 
-typedef struct {
+typedef struct
+{
   MafwRegistry* registry;
   guint next_browse_id;
 } MafwGriloSourcePlugin;
 
 static MafwGriloSourcePlugin plugin = { NULL, 0 };
+static void mafw_grilo_source_init (MafwGriloSource* self);
+static void mafw_grilo_source_class_init (MafwGriloSourceClass* klass);
+static MafwGriloSource *mafw_grilo_source_new (GrlMediaPlugin *grl_plugin);
 
-static void mafw_grilo_source_init(MafwGriloSource* self);
-static void mafw_grilo_source_class_init(MafwGriloSourceClass* klass);
+static guint mafw_grilo_source_browse (MafwSource *source,
+                                       const gchar *object_id,
+                                       gboolean recursive,
+                                       const MafwFilter *filter,
+                                       const gchar *sort_criteria,
+                                       const gchar *const *metadata_keys,
+                                       guint skip_count,
+                                       guint item_count,
+                                       MafwSourceBrowseResultCb browse_cb,
+                                       gpointer user_data);
+static gboolean mafw_grilo_source_cancel_browse (MafwSource *source,
+                                                 guint browse_id,
+                                                 GError **error);
 
-static guint mafw_grilo_source_browse(MafwSource *source,
-                                      const gchar *object_id,
-                                      gboolean recursive,
-                                      const MafwFilter *filter,
-                                      const gchar *sort_criteria,
-                                      const gchar *const *metadata_keys,
-                                      guint skip_count,
-                                      guint item_count,
-                                      MafwSourceBrowseResultCb browse_cb,
-                                      gpointer user_data);
-static gboolean mafw_grilo_source_cancel_browse(MafwSource *source,
-                                                guint browse_id,
-                                                GError **error);
+static void mafw_grilo_source_get_metadata (MafwSource *source,
+                                            const gchar *object_id,
+                                            const gchar *const *metadata_keys,
+                                            MafwSourceMetadataResultCb cb,
+                                            gpointer user_data);
 
-static void mafw_grilo_source_get_metadata(MafwSource *source,
-                                           const gchar *object_id,
-                                           const gchar *const *metadata_keys,
-                                           MafwSourceMetadataResultCb cb,
-                                           gpointer user_data);
 
 G_MODULE_EXPORT MafwPluginDescriptor mafw_grilo_source_plugin_description = {
   { .name = MAFW_GRILO_SOURCE_PLUGIN_NAME },
@@ -98,25 +101,27 @@ void mafw_grilo_source_deinitialize(GError **error)
   plugin.registry = NULL;
 }
 
-static void mafw_grilo_source_init(MafwGriloSource *self)
+static void
+mafw_grilo_source_init (MafwGriloSource *self)
 {
   MafwGriloSourcePrivate *priv = NULL;
 
-  g_return_if_fail(MAFW_IS_GRILO_SOURCE(self));
-  priv = self->priv = MAFW_GRILO_SOURCE_GET_PRIVATE(self);
+  g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
+  priv = self->priv = MAFW_GRILO_SOURCE_GET_PRIVATE (self);
 }
 
-static void mafw_grilo_source_class_init(MafwGriloSourceClass *klass)
+static void
+mafw_grilo_source_class_init (MafwGriloSourceClass *klass)
 {
   GObjectClass *gobject_class;
   MafwSourceClass *source_class;
 
-  g_return_if_fail(klass != NULL);
+  g_return_if_fail (klass != NULL);
 
-  gobject_class = G_OBJECT_CLASS(klass);
-  source_class = MAFW_SOURCE_CLASS(klass);
+  gobject_class = G_OBJECT_CLASS (klass);
+  source_class = MAFW_SOURCE_CLASS (klass);
 
-  g_type_class_add_private(gobject_class, sizeof(MafwGriloSourcePrivate));
+  g_type_class_add_private (gobject_class, sizeof (MafwGriloSourcePrivate));
 
   source_class->browse = mafw_grilo_source_browse;
   source_class->cancel_browse = mafw_grilo_source_cancel_browse;
@@ -136,57 +141,60 @@ MafwGriloSource *mafw_grilo_source_new(void)
                       NULL);
 }
 
-/**
- * See mafw_source_browse() for more information.
- */
-static guint mafw_grilo_source_browse(MafwSource *source,
-				      const gchar *object_id,
-				      gboolean recursive,
-				      const MafwFilter *filter,
-				      const gchar *sort_criteria,
-				      const gchar *const *metadata_keys,
-				      guint skip_count,
-				      guint item_count,
-				      MafwSourceBrowseResultCb browse_cb,
-				      gpointer user_data)
+static guint
+mafw_grilo_source_browse (MafwSource *source,
+                          const gchar *object_id,
+                          gboolean recursive,
+                          const MafwFilter *filter,
+                          const gchar *sort_criteria,
+                          const gchar *const *metadata_keys,
+                          guint skip_count,
+                          guint item_count,
+                          MafwSourceBrowseResultCb browse_cb,
+                          gpointer user_data)
 {
-  if (browse_cb != NULL) {
-    GError *error = NULL;
-    g_set_error(&error, MAFW_EXTENSION_ERROR,
-                MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-                "Not implemented");
-    browse_cb(source, MAFW_SOURCE_INVALID_BROWSE_ID, 0, 0, NULL, NULL,
-              user_data, error);
-    g_error_free(error);
-  }
+  if (browse_cb != NULL)
+    {
+      GError *error = NULL;
+      g_set_error (&error, MAFW_EXTENSION_ERROR,
+                   MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
+                   "Not implemented");
+      browse_cb (source, MAFW_SOURCE_INVALID_BROWSE_ID, 0, 0, NULL, NULL,
+                 user_data, error);
+      g_error_free (error);
+    }
   return MAFW_SOURCE_INVALID_BROWSE_ID;
 }
 
-static gboolean mafw_grilo_source_cancel_browse(MafwSource *source,
-                                                guint browse_id,
-                                                GError **error)
+static gboolean
+mafw_grilo_source_cancel_browse (MafwSource *source,
+                                 guint browse_id,
+                                 GError **error)
 {
-  if (error) {
-    g_set_error(error, MAFW_EXTENSION_ERROR,
-                MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-                "Not implemented");
-  }
+  if (error)
+    {
+      g_set_error (error, MAFW_EXTENSION_ERROR,
+                   MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
+                   "Not implemented");
+    }
   return FALSE;
 }
 
-static void mafw_grilo_source_get_metadata(MafwSource *source,
-                                           const gchar *object_id,
-                                           const gchar *const *metadata_keys,
-                                           MafwSourceMetadataResultCb
-                                           metadata_cb,
-                                           gpointer user_data)
+static void
+mafw_grilo_source_get_metadata (MafwSource *source,
+                                const gchar *object_id,
+                                const gchar *const *metadata_keys,
+                                MafwSourceMetadataResultCb
+                                metadata_cb,
+                                gpointer user_data)
 {
-  if (metadata_cb != NULL) {
-    GError *error = NULL;
-    g_set_error(&error, MAFW_EXTENSION_ERROR,
-                MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-                "Not implemented");
-    metadata_cb(source, object_id, NULL, user_data, error);
-    g_error_free(error);
-  }
+  if (metadata_cb != NULL)
+    {
+      GError *error = NULL;
+      g_set_error (&error, MAFW_EXTENSION_ERROR,
+                   MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
+                   "Not implemented");
+      metadata_cb (source, object_id, NULL, user_data, error);
+      g_error_free (error);
+    }
 }
