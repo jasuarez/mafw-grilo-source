@@ -42,15 +42,15 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 struct _MafwGriloSourcePrivate
 {
   GrlMediaPlugin *grl_source;
+  guint next_browse_id;
 };
 
 typedef struct
 {
   MafwRegistry* registry;
-  guint next_browse_id;
 } MafwGriloSourcePlugin;
 
-static MafwGriloSourcePlugin plugin = { NULL, 0 };
+static MafwGriloSourcePlugin plugin = { NULL };
 
 enum
   {
@@ -119,6 +119,7 @@ mafw_grilo_source_init (MafwGriloSource *self)
   g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
   priv = self->priv = MAFW_GRILO_SOURCE_GET_PRIVATE (self);
   priv->grl_source = NULL;
+  priv->next_browse_id = 1;
 }
 
 static void
