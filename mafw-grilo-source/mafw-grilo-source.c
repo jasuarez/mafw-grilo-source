@@ -57,6 +57,16 @@ enum
     PROP_GRILO_PLUGIN = 1,
   };
 
+typedef struct
+{
+  MafwGriloSource *mafw_grilo_source;
+  MafwSourceBrowseResultCb mafw_browse_cb;
+  gpointer mafw_user_data;
+  guint mafw_browse_id;
+  guint grl_browse_id;
+  guint index;
+} BrowseCbInfo;
+
 static void mafw_grilo_source_init (MafwGriloSource* self);
 static void mafw_grilo_source_class_init (MafwGriloSourceClass* klass);
 static MafwGriloSource *mafw_grilo_source_new (GrlMediaPlugin *grl_plugin);
