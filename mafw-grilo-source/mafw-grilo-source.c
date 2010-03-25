@@ -421,6 +421,52 @@ mafw_keys_from_grl_media (GrlMedia *grl_media)
   return mafw_metadata_keys;
 }
 
+static void
+grl_browse_cb (GrlMediaSource *grl_source,
+               guint grl_browse_id,
+               GrlMedia *grl_media,
+               guint remaining,
+               gpointer user_data,
+               const GError *error)
+{
+  BrowseCbInfo *browse_cb_info = user_data;
+  gchar *mafw_object_id = NULL;
+  GHashTable *mafw_metadata_keys = NULL;
+
+  if (grl_media)
+    {
+      const gchar *mafw_uuid;
+
+      mafw_uuid = mafw_extension_get_uuid (MAFW_EXTENSION (browse_cb_info->
+                                                           mafw_grilo_source));
+
+      mafw_object_id =
+        grl_media_serialize (grl_media, mafw_uuid);
+      mafw_metadata_keys = mafw_keys_from_grl_media (grl_media);
+    }
+
+  browse_cb_info->mafw_browse_cb (MAFW_SOURCE (browse_cb_info->
+                                               mafw_grilo_source),
+                                  browse_cb_info->mafw_browse_id,
+                                  remaining,
+                                  browse_cb_info->index,
+                                  mafw_object_id,
+                                  mafw_metadata_keys,
+                                  browse_cb_info->mafw_user_data,
+                                  error);
+
+  g_free (mafw_object_id);
+  if (mafw_metadata_keys)
+    {
+      g_hash_table_destroy (mafw_metadata_keys);
+    }
+
+  if (!remaining || error)
+    {
+      g_free (user_data);
+    }
+}
+
 /*----------------------------------------------------------------------------
   Public API
   ----------------------------------------------------------------------------*/
