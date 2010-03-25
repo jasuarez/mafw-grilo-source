@@ -254,6 +254,43 @@ mafw_grilo_source_new (GrlMediaPlugin *grl_plugin)
                        NULL);
 }
 
+static GrlMedia *
+grl_media_deserialize (const gchar *object_id)
+{
+  GrlMedia *grl_media = NULL;
+  gchar *serialized_grl_media = NULL;
+  gchar *grl_media_type, *grl_media_id;
+
+  if (mafw_source_split_objectid (object_id, NULL, &serialized_grl_media) &&
+      serialized_grl_media[0] != '\0')
+    {
+      /* We search ':' and then we convert the type in NULL terminated and
+         prepare the media id */
+      grl_media_type = serialized_grl_media;
+      grl_media_id = g_strstr_len (serialized_grl_media, -1, ":");
+      grl_media_type[grl_media_id - grl_media_type] = '\0';
+      grl_media_id++;
+
+      grl_media = g_object_new (g_type_from_name (grl_media_type), NULL);
+      grl_media_set_id (grl_media, grl_media_id);
+    }
+
+  g_free (serialized_grl_media);
+
+  return grl_media;
+}
+
+static gchar *
+grl_media_serialize (GrlMedia *grl_media, const gchar *source_id)
+{
+  const gchar *media_id, *type;
+
+  type = G_OBJECT_TYPE_NAME (grl_media);
+  media_id = grl_media_get_id (grl_media);
+
+  return g_strconcat (source_id, "::", type, ":", media_id, NULL);
+}
+
 /*----------------------------------------------------------------------------
   Public API
   ----------------------------------------------------------------------------*/
