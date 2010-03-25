@@ -483,17 +483,39 @@ mafw_grilo_source_browse (MafwSource *source,
                           MafwSourceBrowseResultCb browse_cb,
                           gpointer user_data)
 {
-  if (browse_cb != NULL)
-    {
-      GError *error = NULL;
-      g_set_error (&error, MAFW_EXTENSION_ERROR,
-                   MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-                   "Not implemented");
-      browse_cb (source, MAFW_SOURCE_INVALID_BROWSE_ID, 0, 0, NULL, NULL,
-                 user_data, error);
-      g_error_free (error);
-    }
-  return MAFW_SOURCE_INVALID_BROWSE_ID;
+  GrlMedia *grl_media;
+  BrowseCbInfo *browse_cb_info;
+  GList *grl_keys;
+
+  g_return_val_if_fail (browse_cb, MAFW_SOURCE_INVALID_BROWSE_ID);
+
+  browse_cb_info = g_new0 (BrowseCbInfo, 1);
+
+  browse_cb_info->mafw_grilo_source = MAFW_GRILO_SOURCE (source);
+  browse_cb_info->mafw_browse_cb = browse_cb;
+  browse_cb_info->mafw_user_data = user_data;
+  browse_cb_info->mafw_browse_id =
+    browse_cb_info->mafw_grilo_source->priv->next_browse_id++;
+
+  grl_media = grl_media_deserialize (object_id);
+
+  grl_keys = mafw_keys_to_grl_keys (metadata_keys);
+
+  browse_cb_info->grl_browse_id =
+    grl_media_source_browse (GRL_MEDIA_SOURCE (browse_cb_info->
+                                               mafw_grilo_source->priv->
+                                               grl_source),
+                             grl_media,
+                             grl_keys,
+                             skip_count,
+                             item_count ? item_count : G_MAXUINT,
+                             GRL_RESOLVE_IDLE_RELAY | GRL_RESOLVE_FAST_ONLY,
+                             grl_browse_cb,
+                             browse_cb_info);
+
+  g_list_free (grl_keys);
+
+  return browse_cb_info->mafw_browse_id;
 }
 
 static gboolean
