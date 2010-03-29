@@ -39,6 +39,7 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
   (G_TYPE_INSTANCE_GET_PRIVATE ((object), MAFW_TYPE_GRILO_SOURCE,	\
                                 MafwGriloSourcePrivate))
 
+#define MAFW_GRILO_SOURCE_ERROR (mafw_grilo_source_error_quark ())
 struct _MafwGriloSourcePrivate
 {
   GrlMediaPlugin *grl_source;
@@ -200,6 +201,12 @@ set_property (GObject *gobject, guint prop_id,
       G_OBJECT_WARN_INVALID_PROPERTY_ID (source, prop_id, pspec);
       break;
     }
+}
+
+static GQuark
+mafw_grilo_source_error_quark (void)
+{
+  return g_quark_from_static_string ("mafw-grilo-source-error-quark");
 }
 
 static void
