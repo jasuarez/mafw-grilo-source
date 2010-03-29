@@ -41,6 +41,9 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
                                 MafwGriloSourcePrivate))
 
 #define MAFW_GRILO_SOURCE_ERROR (mafw_grilo_source_error_quark ())
+#define MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS \
+  "force-browse-slow-keys"
+
 struct _MafwGriloSourcePrivate
 {
   GrlMediaPlugin *grl_source;
@@ -183,6 +186,10 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv->grl_source = NULL;
   priv->next_browse_id = 1;
   priv->force_browse_slow_keys = FALSE;
+
+  mafw_extension_add_property(MAFW_EXTENSION(self),
+                              MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS,
+                              G_TYPE_BOOLEAN);
 }
 
 static void
@@ -211,6 +218,59 @@ mafw_grilo_source_error_quark (void)
 }
 
 static void
+mafw_grilo_source_get_property (MafwExtension *self,
+                                const gchar *key,
+                                MafwExtensionPropertyCallback callback,
+                                gpointer user_data)
+{
+  MafwGriloSource *source = MAFW_GRILO_SOURCE (self);
+  GValue *value = NULL;
+  GError *error = NULL;
+
+  g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
+  g_return_if_fail (callback != NULL);
+  g_return_if_fail (key != NULL);
+
+  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS) == 0)
+    {
+      value = g_new0 (GValue, 1);
+      g_value_init (value, G_TYPE_BOOLEAN);
+      g_value_set_uint (value, source->priv->force_browse_slow_keys);
+    }
+  else
+    {
+      /* Unsupported property */
+      error = g_error_new(MAFW_GRILO_SOURCE_ERROR,
+                          MAFW_EXTENSION_ERROR_GET_PROPERTY,
+                          "Unsupported property");
+    }
+
+  callback (self, key, value, user_data, error);
+}
+
+static void
+mafw_grilo_source_set_property (MafwExtension *self,
+                                const gchar *key,
+                                const GValue *value)
+{
+  MafwGriloSource *source = MAFW_GRILO_SOURCE (self);
+
+  g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
+  g_return_if_fail (key != NULL);
+
+  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS) == 0)
+    {
+      source->priv->force_browse_slow_keys = g_value_get_boolean (value);
+    }
+  else
+    {
+      return;
+    }
+
+  mafw_extension_emit_property_changed (self, key, value);
+}
+
+static void
 mafw_grilo_source_class_init (MafwGriloSourceClass *klass)
 {
   GObjectClass *gobject_class;
@@ -228,6 +288,11 @@ mafw_grilo_source_class_init (MafwGriloSourceClass *klass)
   source_class->get_metadata = mafw_grilo_source_get_metadata;
 
   gobject_class->set_property = set_property;
+
+  MAFW_EXTENSION_CLASS(klass)->get_extension_property =
+    mafw_grilo_source_get_property;
+  MAFW_EXTENSION_CLASS(klass)->set_extension_property =
+    mafw_grilo_source_set_property;
 
   g_object_class_install_property (gobject_class, PROP_GRILO_PLUGIN,
                                    g_param_spec_object ("grl-plugin",
