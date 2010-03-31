@@ -41,8 +41,7 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
                                 MafwGriloSourcePrivate))
 
 #define MAFW_GRILO_SOURCE_ERROR (mafw_grilo_source_error_quark ())
-#define MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS \
-  "force-browse-slow-keys"
+#define MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE "metadata-mode"
 
 typedef enum
   {
@@ -195,8 +194,8 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv->metadata_mode = GRL_RESOLVE_FAST_ONLY;
 
   mafw_extension_add_property(MAFW_EXTENSION(self),
-                              MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS,
-                              G_TYPE_BOOLEAN);
+                              MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE,
+                              G_TYPE_UINT);
 }
 
 static void
@@ -238,11 +237,24 @@ mafw_grilo_source_get_property (MafwExtension *self,
   g_return_if_fail (callback != NULL);
   g_return_if_fail (key != NULL);
 
-  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS) == 0)
+  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE) == 0)
     {
       value = g_new0 (GValue, 1);
-      g_value_init (value, G_TYPE_BOOLEAN);
-      g_value_set_uint (value, source->priv->force_browse_slow_keys);
+      g_value_init (value, G_TYPE_UINT);
+      switch (source->priv->metadata_mode)
+        {
+        case GRL_RESOLVE_FAST_ONLY:
+          g_value_set_uint (value, MAFW_GRILO_SOURCE_METADATA_MODE_FAST);
+          break;
+        case GRL_RESOLVE_NORMAL:
+          g_value_set_uint (value, MAFW_GRILO_SOURCE_METADATA_MODE_NORMAL);
+          break;
+        case GRL_RESOLVE_FULL:
+          g_value_set_uint (value, MAFW_GRILO_SOURCE_METADATA_MODE_FULL);
+          break;
+        default:
+          g_assert_not_reached ();
+        }
     }
   else
     {
@@ -265,9 +277,22 @@ mafw_grilo_source_set_property (MafwExtension *self,
   g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
   g_return_if_fail (key != NULL);
 
-  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS) == 0)
+  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE) == 0)
     {
-      source->priv->force_browse_slow_keys = g_value_get_boolean (value);
+      switch (g_value_get_uint (value))
+        {
+        case MAFW_GRILO_SOURCE_METADATA_MODE_FAST:
+          source->priv->metadata_mode = GRL_RESOLVE_FAST_ONLY;
+          break;
+        case MAFW_GRILO_SOURCE_METADATA_MODE_NORMAL:
+          source->priv->metadata_mode = GRL_RESOLVE_NORMAL;
+          break;
+        case MAFW_GRILO_SOURCE_METADATA_MODE_FULL:
+          source->priv->metadata_mode = GRL_RESOLVE_FULL;
+          break;
+        default:
+          g_warning ("Wrong metadata mode: %d", g_value_get_uint (value));
+        }
     }
   else
     {
