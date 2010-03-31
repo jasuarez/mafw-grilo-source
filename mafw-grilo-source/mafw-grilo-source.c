@@ -48,7 +48,7 @@ struct _MafwGriloSourcePrivate
 {
   GrlMediaPlugin *grl_source;
   guint next_browse_id;
-  gboolean force_browse_slow_keys;
+  GrlMetadataResolutionFlags metadata_mode;
 };
 
 typedef struct
@@ -185,7 +185,7 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv = self->priv = MAFW_GRILO_SOURCE_GET_PRIVATE (self);
   priv->grl_source = NULL;
   priv->next_browse_id = 1;
-  priv->force_browse_slow_keys = FALSE;
+  priv->metadata_mode = GRL_RESOLVE_FAST_ONLY;
 
   mafw_extension_add_property(MAFW_EXTENSION(self),
                               MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS,
