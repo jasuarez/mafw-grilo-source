@@ -338,6 +338,79 @@ mafw_keys_to_grl_keys (const gchar *const *metadata_keys)
   return keys;
 }
 
+static GHashTable *
+mafw_keys_from_grl_media (GrlMedia *grl_media)
+{
+  GHashTable *mafw_metadata_keys;
+  GList *keys, *current;
+
+  mafw_metadata_keys = mafw_metadata_new ();
+
+  keys = grl_data_get_keys (GRL_DATA (grl_media));
+
+  for (current = keys; current; current = g_list_next (current))
+    {
+      GrlKeyID id;
+      const GValue *value;
+
+      id = POINTER_TO_GRLKEYID (current->data);
+      value = grl_data_get (GRL_DATA (grl_media), id);
+
+      if (value)
+        {
+#define GRL_KEY_TO_MAFW_KEY(mafw_key, grl_key) \
+          (id == grl_key) { \
+            g_debug ("Converting %s from grilo\n", mafw_key); \
+            mafw_metadata_add_val (mafw_metadata_keys, mafw_key, (GValue*) value); \
+          }
+
+          if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_URI, GRL_METADATA_KEY_URL)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_TITLE, GRL_METADATA_KEY_TITLE)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_ARTIST, GRL_METADATA_KEY_ARTIST)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_ALBUM, GRL_METADATA_KEY_ALBUM)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_GENRE, GRL_METADATA_KEY_GENRE)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_THUMBNAIL, GRL_METADATA_KEY_THUMBNAIL)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_COMPOSER, GRL_METADATA_KEY_AUTHOR)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_DESCRIPTION, GRL_METADATA_KEY_DESCRIPTION)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_LYRICS, GRL_METADATA_KEY_LYRICS)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_DURATION, GRL_METADATA_KEY_DURATION)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_CHILDCOUNT_1, GRL_METADATA_KEY_CHILDCOUNT)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_RES_X, GRL_METADATA_KEY_WIDTH)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_RES_Y, GRL_METADATA_KEY_HEIGHT)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_VIDEO_FRAMERATE, GRL_METADATA_KEY_FRAMERATE)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_RATING, GRL_METADATA_KEY_RATING)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_BITRATE, GRL_METADATA_KEY_BITRATE)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_PLAY_COUNT, GRL_METADATA_KEY_PLAY_COUNT)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_LAST_PLAYED, GRL_METADATA_KEY_LAST_PLAYED)
+          else if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_PAUSED_POSITION, GRL_METADATA_KEY_LAST_POSITION)
+     }
+   }
+
+  if (GRL_IS_MEDIA_BOX (grl_media))
+    {
+      g_debug ("Converting mime container from grilo\n");
+      mafw_metadata_add_str (mafw_metadata_keys, MAFW_METADATA_KEY_MIME,
+                             MAFW_METADATA_VALUE_MIME_CONTAINER);
+    }
+  else
+    {
+      const gchar *mime;
+
+      mime = grl_media_get_mime (grl_media);
+
+      if (mime)
+        {
+          g_debug ("Converting mime from grilo\n");
+          mafw_metadata_add_str (mafw_metadata_keys, MAFW_METADATA_KEY_MIME,
+                                 mime);
+        }
+    }
+
+  g_list_free (keys);
+
+  return mafw_metadata_keys;
+}
+
 /*----------------------------------------------------------------------------
   Public API
   ----------------------------------------------------------------------------*/
