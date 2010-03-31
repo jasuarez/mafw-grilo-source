@@ -44,6 +44,13 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 #define MAFW_PROPERTY_GRILO_SOURCE_FORCE_BROWSE_SLOW_KEYS \
   "force-browse-slow-keys"
 
+typedef enum
+  {
+    MAFW_GRILO_SOURCE_METADATA_MODE_FAST,
+    MAFW_GRILO_SOURCE_METADATA_MODE_NORMAL,
+    MAFW_GRILO_SOURCE_METADATA_MODE_FULL,
+  } MafwGriloSourceMetadataMode;
+
 struct _MafwGriloSourcePrivate
 {
   GrlMediaPlugin *grl_source;
