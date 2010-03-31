@@ -616,7 +616,9 @@ mafw_grilo_source_browse (MafwSource *source,
                              grl_keys,
                              skip_count,
                              item_count ? item_count : G_MAXUINT,
-                             GRL_RESOLVE_IDLE_RELAY | GRL_RESOLVE_FAST_ONLY,
+                             GRL_RESOLVE_IDLE_RELAY |
+                             browse_cb_info->mafw_grilo_source->priv->
+                             metadata_mode,
                              grl_browse_cb,
                              browse_cb_info);
 
