@@ -731,13 +731,31 @@ mafw_grilo_source_get_metadata (MafwSource *source,
                                 metadata_cb,
                                 gpointer user_data)
 {
-  if (metadata_cb != NULL)
-    {
-      GError *error = NULL;
-      g_set_error (&error, MAFW_EXTENSION_ERROR,
-                   MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-                   "Not implemented");
-      metadata_cb (source, object_id, NULL, user_data, error);
-      g_error_free (error);
-    }
+  MetadataCbInfo *metadata_cb_info;
+  GrlMedia *grl_media;
+  GList *grl_keys;
+
+  g_return_if_fail (metadata_cb);
+
+  metadata_cb_info = g_new0 (MetadataCbInfo, 1);
+
+  metadata_cb_info->mafw_grilo_source = MAFW_GRILO_SOURCE (source);
+  metadata_cb_info->mafw_metadata_cb = metadata_cb;
+  metadata_cb_info->mafw_user_data = user_data;
+  metadata_cb_info->mafw_object_id = g_strdup (object_id);
+
+  grl_media = grl_media_deserialize (object_id);
+  grl_keys = mafw_keys_to_grl_keys (metadata_keys);
+
+  grl_media_source_metadata (GRL_MEDIA_SOURCE (metadata_cb_info->
+                                               mafw_grilo_source->
+                                               priv->grl_source),
+                             grl_media, grl_keys,
+                             GRL_RESOLVE_IDLE_RELAY |
+                             metadata_cb_info->mafw_grilo_source->priv->
+                             resolve_metadata_mode,
+                             grl_metadata_cb,
+                             metadata_cb_info);
+
+  g_list_free (grl_keys);
 }
