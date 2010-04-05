@@ -627,6 +627,35 @@ grl_browse_cb (GrlMediaSource *grl_source,
     }
 }
 
+static void
+grl_metadata_cb (GrlMediaSource *source,
+                 GrlMedia *grl_media,
+                 gpointer user_data,
+                 const GError *error)
+{
+  MetadataCbInfo *metadata_cb_info = user_data;
+  GHashTable *mafw_metadata_keys = NULL;
+
+  if (grl_media)
+    {
+      mafw_metadata_keys = mafw_keys_from_grl_media (grl_media);
+    }
+
+  metadata_cb_info->mafw_metadata_cb (MAFW_SOURCE (metadata_cb_info->
+                                                   mafw_grilo_source),
+                                      metadata_cb_info->mafw_object_id,
+                                      mafw_metadata_keys,
+                                      metadata_cb_info->mafw_user_data,
+                                      error);
+
+  if (mafw_metadata_keys)
+    {
+      g_hash_table_destroy (mafw_metadata_keys);
+    }
+  g_free (metadata_cb_info->mafw_object_id);
+  g_free (metadata_cb_info);
+}
+
 /*----------------------------------------------------------------------------
   Public API
   ----------------------------------------------------------------------------*/
