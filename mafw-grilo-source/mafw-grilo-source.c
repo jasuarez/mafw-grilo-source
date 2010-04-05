@@ -41,7 +41,7 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
                                 MafwGriloSourcePrivate))
 
 #define MAFW_GRILO_SOURCE_ERROR (mafw_grilo_source_error_quark ())
-#define MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE "metadata-mode"
+#define MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE "browse-metadata-mode"
 
 typedef enum
   {
@@ -54,7 +54,7 @@ struct _MafwGriloSourcePrivate
 {
   GrlMediaPlugin *grl_source;
   guint next_browse_id;
-  GrlMetadataResolutionFlags metadata_mode;
+  GrlMetadataResolutionFlags browse_metadata_mode;
 };
 
 typedef struct
@@ -191,10 +191,10 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv = self->priv = MAFW_GRILO_SOURCE_GET_PRIVATE (self);
   priv->grl_source = NULL;
   priv->next_browse_id = 1;
-  priv->metadata_mode = GRL_RESOLVE_FAST_ONLY;
+  priv->browse_metadata_mode = GRL_RESOLVE_FAST_ONLY;
 
   mafw_extension_add_property(MAFW_EXTENSION(self),
-                              MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE,
+                              MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE,
                               G_TYPE_UINT);
 }
 
@@ -237,11 +237,11 @@ mafw_grilo_source_get_property (MafwExtension *self,
   g_return_if_fail (callback != NULL);
   g_return_if_fail (key != NULL);
 
-  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE) == 0)
+  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE) == 0)
     {
       value = g_new0 (GValue, 1);
       g_value_init (value, G_TYPE_UINT);
-      switch (source->priv->metadata_mode)
+      switch (source->priv->browse_metadata_mode)
         {
         case GRL_RESOLVE_FAST_ONLY:
           g_value_set_uint (value, MAFW_GRILO_SOURCE_METADATA_MODE_FAST);
@@ -277,18 +277,18 @@ mafw_grilo_source_set_property (MafwExtension *self,
   g_return_if_fail (MAFW_IS_GRILO_SOURCE (self));
   g_return_if_fail (key != NULL);
 
-  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_METADATA_MODE) == 0)
+  if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE) == 0)
     {
       switch (g_value_get_uint (value))
         {
         case MAFW_GRILO_SOURCE_METADATA_MODE_FAST:
-          source->priv->metadata_mode = GRL_RESOLVE_FAST_ONLY;
+          source->priv->browse_metadata_mode = GRL_RESOLVE_FAST_ONLY;
           break;
         case MAFW_GRILO_SOURCE_METADATA_MODE_NORMAL:
-          source->priv->metadata_mode = GRL_RESOLVE_NORMAL;
+          source->priv->browse_metadata_mode = GRL_RESOLVE_NORMAL;
           break;
         case MAFW_GRILO_SOURCE_METADATA_MODE_FULL:
-          source->priv->metadata_mode = GRL_RESOLVE_FULL;
+          source->priv->browse_metadata_mode = GRL_RESOLVE_FULL;
           break;
         default:
           g_warning ("Wrong metadata mode: %d", g_value_get_uint (value));
@@ -618,7 +618,7 @@ mafw_grilo_source_browse (MafwSource *source,
                              item_count ? item_count : G_MAXUINT,
                              GRL_RESOLVE_IDLE_RELAY |
                              browse_cb_info->mafw_grilo_source->priv->
-                             metadata_mode,
+                             browse_metadata_mode,
                              grl_browse_cb,
                              browse_cb_info);
 
