@@ -55,6 +55,7 @@ struct _MafwGriloSourcePrivate
   GrlMediaPlugin *grl_source;
   guint next_browse_id;
   GrlMetadataResolutionFlags browse_metadata_mode;
+  GrlMetadataResolutionFlags resolve_metadata_mode;
 };
 
 typedef struct
@@ -192,6 +193,7 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv->grl_source = NULL;
   priv->next_browse_id = 1;
   priv->browse_metadata_mode = GRL_RESOLVE_FAST_ONLY;
+  priv->resolve_metadata_mode = GRL_RESOLVE_NORMAL;
 
   mafw_extension_add_property(MAFW_EXTENSION(self),
                               MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE,
