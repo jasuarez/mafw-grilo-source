@@ -81,6 +81,14 @@ typedef struct
   guint index;
 } BrowseCbInfo;
 
+typedef struct
+{
+  MafwGriloSource *mafw_grilo_source;
+  MafwSourceMetadataResultCb mafw_metadata_cb;
+  gpointer mafw_user_data;
+  gchar *mafw_object_id;
+} MetadataCbInfo;
+
 static void mafw_grilo_source_init (MafwGriloSource* self);
 static void mafw_grilo_source_class_init (MafwGriloSourceClass* klass);
 static MafwGriloSource *mafw_grilo_source_new (GrlMediaPlugin *grl_plugin);
