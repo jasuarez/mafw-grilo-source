@@ -236,6 +236,16 @@ set_property (GObject *gobject, guint prop_id,
 }
 
 static void
+dispose (GObject *object)
+{
+  MafwGriloSource *source = MAFW_GRILO_SOURCE (object);
+
+  g_object_unref (source->priv->grl_source);
+
+  G_OBJECT_CLASS (mafw_grilo_source_parent_class)->dispose (object);
+}
+
+static void
 finalize (GObject *object)
 {
   MafwGriloSource *source = MAFW_GRILO_SOURCE (object);
@@ -387,6 +397,7 @@ mafw_grilo_source_class_init (MafwGriloSourceClass *klass)
   source_class->get_metadata = mafw_grilo_source_get_metadata;
 
   gobject_class->set_property = set_property;
+  gobject_class->dispose = dispose;
   gobject_class->finalize = finalize;
 
   MAFW_EXTENSION_CLASS(klass)->get_extension_property =
