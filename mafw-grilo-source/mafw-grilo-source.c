@@ -658,7 +658,11 @@ grl_browse_cb (GrlMediaSource *grl_source,
 
   if (!remaining || error)
     {
-      g_free (user_data);
+      /* we don't free the info, we just remove it from the hash table
+         and it will free it for us */
+      g_hash_table_remove (browse_cb_info->mafw_grilo_source->priv->
+                           browse_requests,
+                           &(browse_cb_info->mafw_browse_id));
     }
 }
 
@@ -724,6 +728,10 @@ mafw_grilo_source_browse (MafwSource *source,
   grl_media = grl_media_deserialize (object_id);
 
   grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
+
+  g_hash_table_insert (browse_cb_info->mafw_grilo_source->priv->browse_requests,
+                       &(browse_cb_info->mafw_browse_id),
+                       browse_cb_info);
 
   browse_cb_info->grl_browse_id =
     grl_media_source_browse (GRL_MEDIA_SOURCE (browse_cb_info->
