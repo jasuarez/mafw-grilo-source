@@ -757,13 +757,31 @@ mafw_grilo_source_cancel_browse (MafwSource *source,
                                  guint browse_id,
                                  GError **error)
 {
-  if (error)
+  BrowseCbInfo *browse_cb_info;
+  MafwGriloSource *mafw_grilo_source = MAFW_GRILO_SOURCE (source);
+
+  browse_cb_info =
+    g_hash_table_lookup (mafw_grilo_source->priv->browse_requests, &browse_id);
+
+  if (browse_cb_info)
     {
-      g_set_error (error, MAFW_EXTENSION_ERROR,
-                   MAFW_EXTENSION_ERROR_UNSUPPORTED_OPERATION,
-                   "Not implemented");
+      grl_media_source_cancel (GRL_MEDIA_SOURCE (mafw_grilo_source->priv->
+                                                 grl_source),
+                               browse_cb_info->grl_browse_id);
+      /* We don't need to free anything here as grilo will call the
+         browse callback and everything will be freed in that
+         moment */
     }
-  return FALSE;
+  /* I wonder if we should just silent ignore it and not reporting any
+     error */
+  else if (error)
+    {
+      g_set_error (error, MAFW_SOURCE_ERROR,
+                   MAFW_SOURCE_ERROR_INVALID_BROWSE_ID,
+                   "Browse not active. Could not cancel.");
+    }
+
+  return browse_cb_info != NULL;
 }
 
 static void
