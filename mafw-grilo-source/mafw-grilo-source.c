@@ -159,6 +159,24 @@ compare_mafw_grilo_source (gconstpointer data1, gconstpointer data2)
 }
 
 static void
+cancel_pending_operations (MafwGriloSource *mafw_grilo_source)
+{
+  GList *list, *current;
+
+  list = g_hash_table_get_values (mafw_grilo_source->priv->browse_requests);
+
+  for (current = list; current; current = g_list_next (current))
+    {
+      BrowseCbInfo *browse_cb_info = current->data;
+
+      mafw_source_cancel_browse (MAFW_SOURCE (mafw_grilo_source),
+                                 browse_cb_info->mafw_browse_id, NULL);
+    }
+
+  g_list_free (list);
+}
+
+static void
 source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
 {
   GSList *link;
@@ -169,6 +187,8 @@ source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
   if (link)
     {
       MafwRegistry *mafw_registry;
+
+      cancel_pending_operations (MAFW_GRILO_SOURCE (link->data));
 
       mafw_registry = mafw_registry_get_instance ();
       mafw_registry_remove_extension (mafw_registry,
