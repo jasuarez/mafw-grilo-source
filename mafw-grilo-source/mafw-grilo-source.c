@@ -465,44 +465,64 @@ static GList *
 mafw_keys_to_grl_keys (MafwGriloSource *mafw_source,
                        const gchar *const *metadata_keys)
 {
-  GList *keys;
+  GList *keys = NULL;
   gint i;
+  gboolean wildcard = FALSE;
 
   g_return_val_if_fail (metadata_keys != NULL, NULL);
 
-  keys = grl_metadata_key_list_new (GRL_METADATA_KEY_ID, NULL);
-
   for (i = 0; metadata_keys[i] != NULL; i++)
     {
-#define MAFW_KEY_TO_GRL_KEY(mafw_key, grl_key) \
-      (strcmp (metadata_keys[i], mafw_key) == 0) { \
-          keys = g_list_prepend (keys, GRLKEYID_TO_POINTER(grl_key)); \
-          g_debug ("Converting %s to grilo\n", mafw_key); \
-      }
+      if (strcmp (metadata_keys[i], MAFW_SOURCE_KEY_WILDCARD) == 0)
+        {
+          g_list_free (keys);
 
-      if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_URI, GRL_METADATA_KEY_URL)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_TITLE, GRL_METADATA_KEY_TITLE)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_ARTIST, GRL_METADATA_KEY_ARTIST)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_ALBUM, GRL_METADATA_KEY_ALBUM)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_GENRE, GRL_METADATA_KEY_GENRE)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_THUMBNAIL, GRL_METADATA_KEY_THUMBNAIL)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_COMPOSER, GRL_METADATA_KEY_AUTHOR)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_DESCRIPTION, GRL_METADATA_KEY_DESCRIPTION)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_LYRICS, GRL_METADATA_KEY_LYRICS)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_DURATION, GRL_METADATA_KEY_DURATION)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_CHILDCOUNT_1, GRL_METADATA_KEY_CHILDCOUNT)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_MIME, GRL_METADATA_KEY_MIME)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_RES_X, GRL_METADATA_KEY_WIDTH)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_RES_Y, GRL_METADATA_KEY_HEIGHT)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_VIDEO_FRAMERATE, GRL_METADATA_KEY_FRAMERATE)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_RATING, GRL_METADATA_KEY_RATING)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_BITRATE, GRL_METADATA_KEY_BITRATE)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_PLAY_COUNT, GRL_METADATA_KEY_PLAY_COUNT)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_LAST_PLAYED, GRL_METADATA_KEY_LAST_PLAYED)
-      else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_PAUSED_POSITION, GRL_METADATA_KEY_LAST_POSITION)
+          keys = g_list_copy ((GList *) grl_metadata_source_supported_keys (GRL_METADATA_SOURCE (mafw_source->priv->grl_source)));
+          g_debug ("Converting \"*\" to grilo\n");
+
+          wildcard = TRUE;
+        }
       else
         {
-          g_message ("MAFW key %s cannot be mapped to Grilo", metadata_keys[i]);
+          if (!keys)
+            {
+              keys = grl_metadata_key_list_new (GRL_METADATA_KEY_ID, NULL);
+            }
+
+          if (!wildcard)
+            {
+
+#define MAFW_KEY_TO_GRL_KEY(mafw_key, grl_key)                        \
+              (strcmp (metadata_keys[i], mafw_key) == 0) {              \
+                keys = g_list_prepend (keys, GRLKEYID_TO_POINTER(grl_key)); \
+                g_debug ("Converting %s to grilo\n", mafw_key);         \
+              }
+
+              if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_URI, GRL_METADATA_KEY_URL)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_TITLE, GRL_METADATA_KEY_TITLE)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_ARTIST, GRL_METADATA_KEY_ARTIST)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_ALBUM, GRL_METADATA_KEY_ALBUM)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_GENRE, GRL_METADATA_KEY_GENRE)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_THUMBNAIL, GRL_METADATA_KEY_THUMBNAIL)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_COMPOSER, GRL_METADATA_KEY_AUTHOR)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_DESCRIPTION, GRL_METADATA_KEY_DESCRIPTION)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_LYRICS, GRL_METADATA_KEY_LYRICS)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_DURATION, GRL_METADATA_KEY_DURATION)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_CHILDCOUNT_1, GRL_METADATA_KEY_CHILDCOUNT)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_MIME, GRL_METADATA_KEY_MIME)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_RES_X, GRL_METADATA_KEY_WIDTH)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_RES_Y, GRL_METADATA_KEY_HEIGHT)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_VIDEO_FRAMERATE, GRL_METADATA_KEY_FRAMERATE)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_RATING, GRL_METADATA_KEY_RATING)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_BITRATE, GRL_METADATA_KEY_BITRATE)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_PLAY_COUNT, GRL_METADATA_KEY_PLAY_COUNT)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_LAST_PLAYED, GRL_METADATA_KEY_LAST_PLAYED)
+              else if MAFW_KEY_TO_GRL_KEY (MAFW_METADATA_KEY_PAUSED_POSITION, GRL_METADATA_KEY_LAST_POSITION)
+              else
+                {
+                  g_message ("MAFW key %s cannot be mapped to Grilo", metadata_keys[i]);
+                }
+            }
         }
     }
 
