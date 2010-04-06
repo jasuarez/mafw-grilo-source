@@ -484,12 +484,12 @@ mafw_keys_to_grl_keys (MafwGriloSource *mafw_source,
         }
       else
         {
-          if (!keys)
+          if (G_UNLIKELY (!keys))
             {
               keys = grl_metadata_key_list_new (GRL_METADATA_KEY_ID, NULL);
             }
 
-          if (!wildcard)
+          if (G_LIKELY (!wildcard))
             {
 
 #define MAFW_KEY_TO_GRL_KEY(mafw_key, grl_key)                        \
