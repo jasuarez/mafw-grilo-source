@@ -214,6 +214,7 @@ destroy_browse_cb_info (gpointer user_data)
 {
   BrowseCbInfo *browse_cb_info = user_data;
 
+  g_object_unref (browse_cb_info->mafw_grilo_source);
   g_free (browse_cb_info);
 }
 
@@ -755,7 +756,7 @@ mafw_grilo_source_browse (MafwSource *source,
 
   browse_cb_info = g_new0 (BrowseCbInfo, 1);
 
-  browse_cb_info->mafw_grilo_source = MAFW_GRILO_SOURCE (source);
+  browse_cb_info->mafw_grilo_source = MAFW_GRILO_SOURCE (g_object_ref (source));
   browse_cb_info->mafw_browse_cb = browse_cb;
   browse_cb_info->mafw_user_data = user_data;
   browse_cb_info->mafw_browse_id =
