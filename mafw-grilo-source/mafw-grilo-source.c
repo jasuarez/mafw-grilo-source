@@ -210,6 +210,14 @@ mafw_grilo_source_deinitialize (GError **error)
 }
 
 static void
+destroy_browse_cb_info (gpointer user_data)
+{
+  BrowseCbInfo *browse_cb_info = user_data;
+
+  g_free (browse_cb_info);
+}
+
+static void
 mafw_grilo_source_init (MafwGriloSource *self)
 {
   MafwGriloSourcePrivate *priv = NULL;
@@ -221,7 +229,8 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv->browse_metadata_mode = GRL_RESOLVE_FAST_ONLY;
   priv->resolve_metadata_mode = GRL_RESOLVE_NORMAL;
   priv->browse_requests =
-    g_hash_table_new_full (g_int_hash, g_int_equal, NULL, g_free);
+    g_hash_table_new_full (g_int_hash, g_int_equal, NULL,
+                           destroy_browse_cb_info);
 
   mafw_extension_add_property(MAFW_EXTENSION(self),
                               MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE,
