@@ -462,7 +462,8 @@ grl_media_serialize (GrlMedia *grl_media, const gchar *source_id)
 }
 
 static GList *
-mafw_keys_to_grl_keys (const gchar *const *metadata_keys)
+mafw_keys_to_grl_keys (MafwGriloSource *mafw_source,
+                       const gchar *const *metadata_keys)
 {
   GList *keys;
   gint i;
@@ -688,7 +689,7 @@ mafw_grilo_source_browse (MafwSource *source,
 
   grl_media = grl_media_deserialize (object_id);
 
-  grl_keys = mafw_keys_to_grl_keys (metadata_keys);
+  grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
 
   browse_cb_info->grl_browse_id =
     grl_media_source_browse (GRL_MEDIA_SOURCE (browse_cb_info->
@@ -745,7 +746,7 @@ mafw_grilo_source_get_metadata (MafwSource *source,
   metadata_cb_info->mafw_object_id = g_strdup (object_id);
 
   grl_media = grl_media_deserialize (object_id);
-  grl_keys = mafw_keys_to_grl_keys (metadata_keys);
+  grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
 
   grl_media_source_metadata (GRL_MEDIA_SOURCE (metadata_cb_info->
                                                mafw_grilo_source->
