@@ -57,6 +57,7 @@ struct _MafwGriloSourcePrivate
   guint next_browse_id;
   GrlMetadataResolutionFlags browse_metadata_mode;
   GrlMetadataResolutionFlags resolve_metadata_mode;
+  GHashTable *browse_requests;
 };
 
 typedef struct
@@ -203,6 +204,8 @@ mafw_grilo_source_init (MafwGriloSource *self)
   priv->next_browse_id = 1;
   priv->browse_metadata_mode = GRL_RESOLVE_FAST_ONLY;
   priv->resolve_metadata_mode = GRL_RESOLVE_NORMAL;
+  priv->browse_requests =
+    g_hash_table_new_full (g_int_hash, g_int_equal, NULL, g_free);
 
   mafw_extension_add_property(MAFW_EXTENSION(self),
                               MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE,
@@ -235,6 +238,8 @@ static void
 finalize (GObject *object)
 {
   MafwGriloSource *source = MAFW_GRILO_SOURCE (object);
+
+  g_hash_table_destroy (source->priv->browse_requests);
 
   G_OBJECT_CLASS (mafw_grilo_source_parent_class)->finalize (object);
 }
