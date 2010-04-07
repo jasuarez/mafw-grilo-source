@@ -162,6 +162,7 @@ source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
       g_object_unref (link->data);
       plugin.grl_sources =
         g_slist_remove_link (plugin.grl_sources, link);
+      g_slist_free_1 (link);
     }
 }
 
