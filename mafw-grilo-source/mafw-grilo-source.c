@@ -143,7 +143,7 @@ source_added_cb (GrlPluginRegistry *grl_registry, gpointer user_data)
 
   mafw_grilo_source = mafw_grilo_source_new (GRL_MEDIA_PLUGIN (user_data));
   plugin.grl_sources =
-    g_slist_prepend (plugin.grl_sources, mafw_grilo_source);
+    g_slist_prepend (plugin.grl_sources, g_object_ref (mafw_grilo_source));
 
   mafw_registry = mafw_registry_get_instance ();
   mafw_registry_add_extension (mafw_registry,
