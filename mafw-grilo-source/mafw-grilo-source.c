@@ -150,12 +150,21 @@ source_added_cb (GrlPluginRegistry *grl_registry, gpointer user_data)
                                MAFW_EXTENSION (mafw_grilo_source));
 }
 
+static gint
+compare_mafw_grilo_source (gconstpointer data1, gconstpointer data2)
+{
+  MafwGriloSource *mafw_source1 = MAFW_GRILO_SOURCE (data1);
+
+  return (gconstpointer) mafw_source1->priv->grl_source - data2;
+}
+
 static void
 source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
 {
   GSList *link;
 
-  link = g_slist_find (plugin.grl_sources, user_data);
+  link = g_slist_find_custom (plugin.grl_sources, user_data,
+                              compare_mafw_grilo_source);
 
   if (link)
     {
