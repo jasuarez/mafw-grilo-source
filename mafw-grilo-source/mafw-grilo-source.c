@@ -168,6 +168,12 @@ source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
 
   if (link)
     {
+      MafwRegistry *mafw_registry;
+
+      mafw_registry = mafw_registry_get_instance ();
+      mafw_registry_remove_extension (mafw_registry,
+                                      MAFW_EXTENSION (link->data));
+
       g_object_unref (link->data);
       plugin.grl_sources =
         g_slist_remove_link (plugin.grl_sources, link);
