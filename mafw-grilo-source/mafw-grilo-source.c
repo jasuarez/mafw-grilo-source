@@ -746,7 +746,7 @@ grl_metadata_cb (GrlMediaSource *source,
 
   if (mafw_metadata_keys)
     {
-      g_hash_table_destroy (mafw_metadata_keys);
+      g_hash_table_unref (mafw_metadata_keys);
     }
   g_free (metadata_cb_info->mafw_object_id);
   g_free (metadata_cb_info);
