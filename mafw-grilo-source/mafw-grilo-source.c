@@ -201,6 +201,18 @@ source_removed_cb (GrlPluginRegistry *registry, gpointer user_data)
     }
 }
 
+static void
+initialize_media_types (void)
+{
+  /* This is a hack to ensure that the GrlMedia* are registered to be
+     used when deserializing any object of that type */
+  GType type;
+  type = grl_media_box_get_type ();
+  type = grl_media_audio_get_type ();
+  type = grl_media_video_get_type ();
+  type = grl_media_image_get_type ();
+}
+
 static gboolean
 mafw_grilo_source_initialize (MafwRegistry *mafw_registry,
                               GError **error)
@@ -208,6 +220,8 @@ mafw_grilo_source_initialize (MafwRegistry *mafw_registry,
   GrlPluginRegistry *grl_registry;
 
   g_debug ("Mafw Grilo plugin initializing");
+
+  initialize_media_types ();
 
   grl_registry = grl_plugin_registry_get_instance ();
 
