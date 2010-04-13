@@ -724,7 +724,7 @@ grl_browse_cb (GrlMediaSource *grl_source,
   g_free (mafw_object_id);
   if (mafw_metadata_keys)
     {
-      g_hash_table_destroy (mafw_metadata_keys);
+      g_hash_table_unref (mafw_metadata_keys);
     }
 
   if (!remaining || error)
