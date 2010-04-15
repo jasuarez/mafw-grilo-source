@@ -615,7 +615,7 @@ mafw_keys_to_grl_keys (MafwGriloSource *mafw_source,
 }
 
 static GHashTable *
-mafw_keys_from_grl_media (GrlMedia *grl_media)
+mafw_keys_from_grl_media (MafwGriloSource *mafw_source, GrlMedia *grl_media)
 {
   GHashTable *mafw_metadata_keys;
   GList *keys, *current;
@@ -711,7 +711,9 @@ grl_browse_cb (GrlMediaSource *grl_source,
 
       mafw_object_id =
         grl_media_serialize (grl_media, mafw_uuid);
-      mafw_metadata_keys = mafw_keys_from_grl_media (grl_media);
+      mafw_metadata_keys = mafw_keys_from_grl_media (browse_cb_info->
+                                                     mafw_grilo_source,
+                                                     grl_media);
     }
 
   browse_cb_info->mafw_browse_cb (MAFW_SOURCE (browse_cb_info->
@@ -751,7 +753,9 @@ grl_metadata_cb (GrlMediaSource *source,
 
   if (grl_media)
     {
-      mafw_metadata_keys = mafw_keys_from_grl_media (grl_media);
+      mafw_metadata_keys = mafw_keys_from_grl_media (metadata_cb_info->
+                                                     mafw_grilo_source,
+                                                     grl_media);
     }
 
   metadata_cb_info->mafw_metadata_cb (MAFW_SOURCE (metadata_cb_info->
