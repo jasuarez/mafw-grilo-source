@@ -253,6 +253,37 @@ destroy_browse_cb_info (gpointer user_data)
   g_free (browse_cb_info);
 }
 
+static const gchar *
+get_default_mime (MafwGriloSource *source)
+{
+  /* The mime is needed so that the apps can properly filter by them
+     when showing the results. As in some sources mime is a slow key
+     and we do not want to slow things down, we prefer to write this
+     HACK and set a default mime type depending on the source. This
+     way we always have a fallback. We could just say it is video, but
+     then in the interfaces showing icons, we would se an ugly video
+     icon for music or even they could be played like that. */
+
+  if (G_UNLIKELY (!source->priv->default_mime))
+    {
+      if (strcmp (mafw_extension_get_uuid (MAFW_EXTENSION (source)),
+                  "grl_jamendo") == 0 ||
+          strcmp (mafw_extension_get_uuid (MAFW_EXTENSION (source)),
+                  "grl_shoutcast") == 0)
+        {
+          source->priv->default_mime =
+            g_strdup (MAFW_METADATA_VALUE_MIME_AUDIO);
+        }
+      else
+        {
+          source->priv->default_mime =
+            g_strdup (MAFW_METADATA_VALUE_MIME_VIDEO);
+        }
+    }
+
+  return source->priv->default_mime;
+}
+
 static void
 mafw_grilo_source_init (MafwGriloSource *self)
 {
