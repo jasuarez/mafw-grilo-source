@@ -43,6 +43,7 @@ G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 #define MAFW_GRILO_SOURCE_ERROR (mafw_grilo_source_error_quark ())
 #define MAFW_PROPERTY_GRILO_SOURCE_BROWSE_METADATA_MODE "browse-metadata-mode"
 #define MAFW_PROPERTY_GRILO_SOURCE_RESOLVE_METADATA_MODE "resolve-metadata-mode"
+#define MAFW_PROPERTY_GRILO_SOURCE_DEFAULT_MIME "default-mime"
 
 typedef enum
   {
@@ -306,6 +307,9 @@ mafw_grilo_source_init (MafwGriloSource *self)
   mafw_extension_add_property(MAFW_EXTENSION(self),
                               MAFW_PROPERTY_GRILO_SOURCE_RESOLVE_METADATA_MODE,
                               G_TYPE_UINT);
+  mafw_extension_add_property(MAFW_EXTENSION(self),
+                              MAFW_PROPERTY_GRILO_SOURCE_DEFAULT_MIME,
+                              G_TYPE_STRING);
 }
 
 static void
@@ -409,6 +413,12 @@ mafw_grilo_source_get_property (MafwExtension *self,
           g_assert_not_reached ();
         }
     }
+  else if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_RESOLVE_METADATA_MODE) == 0)
+    {
+      value = g_new0 (GValue, 1);
+      g_value_init (value, G_TYPE_STRING);
+      g_value_set_string (value, source->priv->default_mime);
+    }
   else
     {
       /* Unsupported property */
@@ -463,6 +473,12 @@ mafw_grilo_source_set_property (MafwExtension *self,
         default:
           g_warning ("Wrong metadata mode: %d", g_value_get_uint (value));
         }
+    }
+  else if (strcmp (key, MAFW_PROPERTY_GRILO_SOURCE_RESOLVE_METADATA_MODE) == 0)
+    {
+      gchar *old_string = source->priv->default_mime;
+      source->priv->default_mime = g_value_dup_string (value);
+      g_free (old_string);
     }
   else
     {
