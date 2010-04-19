@@ -9,7 +9,8 @@ Standards-Version: 3.7.2
 Package: mafw-grilo-source
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer0.10-flv,
+         gstreamer0.10-ffmpeg
 Description: MAFW Grilo source plugin
  This MAFW plugin provides contents gathered by Grilo with MAFW
  interface.
