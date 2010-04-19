@@ -662,6 +662,9 @@ mafw_keys_from_grl_media (GrlMedia *grl_media)
      }
    }
 
+  /* We set this independently of it coming in the data or not,
+     because in some sources, it can be a slow key and it does not
+     come even if we had requested it. */
   if (GRL_IS_MEDIA_BOX (grl_media))
     {
       g_debug ("Converting mime container from grilo\n");
