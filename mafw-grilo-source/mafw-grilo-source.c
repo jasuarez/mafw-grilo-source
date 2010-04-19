@@ -717,6 +717,12 @@ mafw_keys_from_grl_media (MafwGriloSource *mafw_source, GrlMedia *grl_media)
           mafw_metadata_add_str (mafw_metadata_keys, MAFW_METADATA_KEY_MIME,
                                  mime);
         }
+      else
+        {
+          g_debug ("Setting default mime\n");
+          mafw_metadata_add_str (mafw_metadata_keys, MAFW_METADATA_KEY_MIME,
+                                             get_default_mime (mafw_source));
+        }
     }
 
   g_list_free (keys);
