@@ -11,7 +11,7 @@ Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: MAFW Grilo source plugin
- This MAFW plugin provides all contents gathered by Grilo with MAFW
+ This MAFW plugin provides contents gathered by Grilo with MAFW
  interface.
 
 Package: mafw-grilo-source-dbg
