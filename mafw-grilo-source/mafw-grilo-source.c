@@ -31,6 +31,9 @@
 
 #include "mafw-grilo-source.h"
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "mafw-grilo-source"
+
 #define MAFW_GRILO_SOURCE_PLUGIN_NAME "MAFW-Grilo-Source"
 
 
