@@ -143,6 +143,10 @@ source_added_cb (GrlPluginRegistry *grl_registry, gpointer user_data)
   if (!(supported_ops & GRL_OP_BROWSE &&
         supported_ops & GRL_OP_METADATA))
     {
+      g_message ("discarded: %s (browse %s, metadata %s)",
+                 grl_media_plugin_get_id (GRL_MEDIA_PLUGIN (user_data)),
+                 supported_ops & GRL_OP_BROWSE ? "yes" : "no",
+                 supported_ops & GRL_OP_METADATA ? "yes" : "no");
       return;
     }
 
