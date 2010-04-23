@@ -983,6 +983,18 @@ mafw_grilo_source_get_metadata (MafwSource *source,
                                  grl_metadata_cb,
                                  metadata_cb_info);
     }
+  else
+    {
+      grl_media_source_browse (GRL_MEDIA_SOURCE (metadata_cb_info->
+                                                 mafw_grilo_source->priv->
+                                                 grl_source),
+                               grl_media, grl_keys, 0, 1,
+                               GRL_RESOLVE_IDLE_RELAY |
+                               metadata_cb_info->mafw_grilo_source->priv->
+                               resolve_metadata_mode,
+                               grl_browse_metadata_cb,
+                               metadata_cb_info);
+    }
 
   g_list_free (grl_keys);
 }
