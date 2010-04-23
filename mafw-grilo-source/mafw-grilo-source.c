@@ -936,6 +936,7 @@ mafw_grilo_source_get_metadata (MafwSource *source,
   MetadataCbInfo *metadata_cb_info;
   GrlMedia *grl_media;
   GList *grl_keys;
+  GrlSupportedOps supported_ops;
 
   g_return_if_fail (metadata_cb);
 
@@ -949,15 +950,20 @@ mafw_grilo_source_get_metadata (MafwSource *source,
   grl_media = grl_media_deserialize (object_id);
   grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
 
-  grl_media_source_metadata (GRL_MEDIA_SOURCE (metadata_cb_info->
-                                               mafw_grilo_source->
-                                               priv->grl_source),
-                             grl_media, grl_keys,
-                             GRL_RESOLVE_IDLE_RELAY |
-                             metadata_cb_info->mafw_grilo_source->priv->
-                             resolve_metadata_mode,
-                             grl_metadata_cb,
-                             metadata_cb_info);
+  supported_ops =
+    grl_metadata_source_supported_operations (GRL_METADATA_SOURCE (user_data));
+  if (supported_ops & GRL_OP_METADATA)
+    {
+      grl_media_source_metadata (GRL_MEDIA_SOURCE (metadata_cb_info->
+                                                   mafw_grilo_source->
+                                                   priv->grl_source),
+                                 grl_media, grl_keys,
+                                 GRL_RESOLVE_IDLE_RELAY |
+                                 metadata_cb_info->mafw_grilo_source->priv->
+                                 resolve_metadata_mode,
+                                 grl_metadata_cb,
+                                 metadata_cb_info);
+    }
 
   g_list_free (grl_keys);
 }
