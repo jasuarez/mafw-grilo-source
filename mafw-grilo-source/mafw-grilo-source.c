@@ -694,7 +694,8 @@ mafw_keys_from_grl_media (MafwGriloSource *mafw_source, GrlMedia *grl_media)
 #define GRL_KEY_TO_MAFW_KEY(mafw_key, grl_key) \
           (id == grl_key) { \
             g_debug ("Converting %s from grilo\n", mafw_key); \
-            mafw_metadata_add_val (mafw_metadata_keys, mafw_key, (GValue*) value); \
+            if (!G_VALUE_HOLDS_STRING (value) || g_value_get_string (value)) \
+              mafw_metadata_add_val (mafw_metadata_keys, mafw_key, (GValue*) value); \
           }
 
           if GRL_KEY_TO_MAFW_KEY (MAFW_METADATA_KEY_URI, GRL_METADATA_KEY_URL)
