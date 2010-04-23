@@ -836,6 +836,25 @@ grl_metadata_cb (GrlMediaSource *source,
   g_free (metadata_cb_info);
 }
 
+static void
+grl_browse_metadata_cb (GrlMediaSource *grl_source,
+                        guint grl_browse_id,
+                        GrlMedia *grl_media,
+                        guint remaining,
+                        gpointer user_data,
+                        const GError *error)
+{
+  if (!remaining)
+    {
+      grl_metadata_cb (grl_source, grl_media, user_data, error);
+    }
+  else
+    {
+      g_warning ("Getting metadata with grl_media_source_browse and we have "
+                 "remaining results");
+    }
+}
+
 /*----------------------------------------------------------------------------
   Public API
   ----------------------------------------------------------------------------*/
