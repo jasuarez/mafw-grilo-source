@@ -137,11 +137,10 @@ source_added_cb (GrlPluginRegistry *grl_registry, gpointer user_data)
   MafwGriloSource *mafw_grilo_source;
   MafwRegistry *mafw_registry;
 
-  /* Only sources that implement browse and metadata are of interest */
+  /* Only sources that implement browse are of interest */
   supported_ops =
     grl_metadata_source_supported_operations (GRL_METADATA_SOURCE (user_data));
-  if (!(supported_ops & GRL_OP_BROWSE &&
-        supported_ops & GRL_OP_METADATA))
+  if (!supported_ops & GRL_OP_BROWSE)
     {
       g_message ("discarded: %s (browse %s, metadata %s)",
                  grl_media_plugin_get_id (GRL_MEDIA_PLUGIN (user_data)),
