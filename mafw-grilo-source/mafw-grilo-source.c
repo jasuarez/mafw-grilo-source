@@ -975,7 +975,9 @@ mafw_grilo_source_get_metadata (MafwSource *source,
   grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
 
   supported_ops =
-    grl_metadata_source_supported_operations (GRL_METADATA_SOURCE (user_data));
+    grl_metadata_source_supported_operations (GRL_METADATA_SOURCE (metadata_cb_info->
+                                                                   mafw_grilo_source->
+                                                                   priv->grl_source));
   if (supported_ops & GRL_OP_METADATA)
     {
       g_debug ("getting metadata with source_metadata");
