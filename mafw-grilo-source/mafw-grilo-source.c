@@ -978,6 +978,7 @@ mafw_grilo_source_get_metadata (MafwSource *source,
     grl_metadata_source_supported_operations (GRL_METADATA_SOURCE (user_data));
   if (supported_ops & GRL_OP_METADATA)
     {
+      g_debug ("getting metadata with source_metadata");
       grl_media_source_metadata (GRL_MEDIA_SOURCE (metadata_cb_info->
                                                    mafw_grilo_source->
                                                    priv->grl_source),
@@ -990,6 +991,7 @@ mafw_grilo_source_get_metadata (MafwSource *source,
     }
   else
     {
+      g_debug ("getting metadata with source_browse");
       grl_media_source_browse (GRL_MEDIA_SOURCE (metadata_cb_info->
                                                  mafw_grilo_source->priv->
                                                  grl_source),
