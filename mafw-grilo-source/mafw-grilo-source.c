@@ -156,6 +156,11 @@ source_added_cb (GrlPluginRegistry *grl_registry, gpointer user_data)
   mafw_registry = mafw_registry_get_instance ();
   mafw_registry_add_extension (mafw_registry,
                                MAFW_EXTENSION (mafw_grilo_source));
+
+  g_debug ("loaded: %s (browse %s, metadata %s)",
+           grl_media_plugin_get_id (GRL_MEDIA_PLUGIN (user_data)),
+           supported_ops & GRL_OP_BROWSE ? "yes" : "no",
+           supported_ops & GRL_OP_METADATA ? "yes" : "no");
 }
 
 static gint
