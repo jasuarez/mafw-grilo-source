@@ -13,7 +13,11 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer0.10-flv,
          gstreamer0.10-ffmpeg
 Description: MAFW Grilo source plugin
  This MAFW plugin provides contents gathered by Grilo with MAFW
- interface.
+ interface. Currently, grilo-0.1-plugins provides:
+  - Filesystem
+  - Jamendo
+  - SHOUTcast
+  - Youtube
 
 Package: mafw-grilo-source-dbg
 Section: devel
