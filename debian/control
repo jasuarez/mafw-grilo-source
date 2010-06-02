@@ -5,6 +5,7 @@ Maintainer: Xabier Rodriguez Calvar <xrcalvar@igalia.com>
 Build-Depends: debhelper (>= 4.0.0),
 	       libglib2.0-dev, libmafw0-dev, libgrilo-0.1-dev (>= 0.1.4-1)
 Standards-Version: 3.7.2
+XB-Homepage: http://gitorious.org/grilo/mafw-grilo-source
 
 Package: mafw-grilo-source
 Section: libs
