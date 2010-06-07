@@ -1,5 +1,5 @@
 Source: mafw-grilo-source
-Section: user/multimedia
+Section: devel
 Priority: optional
 Maintainer: Xabier Rodriguez Calvar <xrcalvar@igalia.com>
 Build-Depends: debhelper (>= 4.0.0),
@@ -8,7 +8,7 @@ Standards-Version: 3.7.2
 XB-Homepage: http://gitorious.org/grilo/mafw-grilo-source
 
 Package: mafw-grilo-source
-Section: libs
+Section: user/multimedia
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer0.10-flv,
          gstreamer0.10-ffmpeg
