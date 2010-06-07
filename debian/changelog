@@ -1,3 +1,9 @@
+mafw-grilo-source (0.1.0-3) unstable; urgency=low
+
+  * Changed section and some maemo debian/control.
+
+ -- Xabier Rodriguez Calvar <xrcalvar@igalia.com>  Mon, 07 Jun 2010 16:20:37 +0200
+
 mafw-grilo-source (0.1.0-2) unstable; urgency=low
 
   * Changed section and some maemo debian/control stuff.
