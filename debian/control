@@ -11,7 +11,7 @@ Package: mafw-grilo-source
 Section: user/multimedia
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer0.10-flv,
-         gstreamer0.10-ffmpeg
+         gstreamer0.10-ffmpeg, grilo-0.1-plugins (>= 0.1.4-1fremantle1)
 Description: MAFW Grilo source plugin
  This MAFW plugin provides contents gathered by Grilo with MAFW
  interface. Currently, grilo-0.1-plugins provides:
