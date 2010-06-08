@@ -1,3 +1,9 @@
+mafw-grilo-source (0.1.0-4) unstable; urgency=low
+
+  * Added dependency for grilo-plugins
+
+ -- Xabier Rodriguez Calvar <xrcalvar@igalia.com>  Tue, 08 Jun 2010 11:04:03 +0200
+
 mafw-grilo-source (0.1.0-3) unstable; urgency=low
 
   * Changed section and some maemo debian/control.
