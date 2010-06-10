@@ -905,7 +905,7 @@ mafw_grilo_source_browse (MafwSource *source,
                              grl_media,
                              grl_keys,
                              skip_count,
-                             item_count ? item_count : G_MAXUINT,
+                             item_count ? item_count : G_MAXINT,
                              GRL_RESOLVE_IDLE_RELAY |
                              browse_cb_info->mafw_grilo_source->priv->
                              browse_metadata_mode,
