@@ -85,6 +85,7 @@ typedef struct
   guint mafw_browse_id;
   guint grl_browse_id;
   guint index;
+  guint item_count;
 } BrowseCbInfo;
 
 typedef struct
@@ -889,6 +890,7 @@ mafw_grilo_source_browse (MafwSource *source,
   browse_cb_info->mafw_user_data = user_data;
   browse_cb_info->mafw_browse_id =
     browse_cb_info->mafw_grilo_source->priv->next_browse_id++;
+  browse_cb_info->item_count = item_count;
 
   grl_media = grl_media_deserialize (object_id);
 
