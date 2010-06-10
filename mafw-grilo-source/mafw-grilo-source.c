@@ -805,6 +805,13 @@ grl_browse_cb (GrlMediaSource *grl_source,
 
   if (!remaining || error)
     {
+      if (browse_cb_info->total_items > browse_cb_info->item_count)
+        {
+          g_message ("Exceeded item_count %d by returning %d items",
+                     browse_cb_info->item_count,
+                     browse_cb_info->total_items);
+        }
+
       /* we don't free the info, we just remove it from the hash table
          and it will free it for us */
       g_hash_table_remove (browse_cb_info->mafw_grilo_source->priv->
