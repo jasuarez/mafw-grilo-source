@@ -898,8 +898,6 @@ mafw_grilo_source_browse (MafwSource *source,
                        &(browse_cb_info->mafw_browse_id),
                        browse_cb_info);
 
-  /* We don't care of the item_count as the interface does no paginate
-     and we will have missing results */
   browse_cb_info->grl_browse_id =
     grl_media_source_browse (GRL_MEDIA_SOURCE (browse_cb_info->
                                                mafw_grilo_source->priv->
@@ -907,7 +905,7 @@ mafw_grilo_source_browse (MafwSource *source,
                              grl_media,
                              grl_keys,
                              skip_count,
-                             G_MAXINT,
+                             item_count ? item_count : G_MAXINT,
                              GRL_RESOLVE_IDLE_RELAY |
                              browse_cb_info->mafw_grilo_source->priv->
                              browse_metadata_mode,
