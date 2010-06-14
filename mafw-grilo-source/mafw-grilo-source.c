@@ -86,7 +86,6 @@ typedef struct
   guint grl_browse_id;
   guint index;
   guint item_count;
-  gint total_items;
 } BrowseCbInfo;
 
 typedef struct
@@ -784,7 +783,6 @@ grl_browse_cb (GrlMediaSource *grl_source,
       mafw_metadata_keys = mafw_keys_from_grl_media (browse_cb_info->
                                                      mafw_grilo_source,
                                                      grl_media);
-      browse_cb_info->total_items++;
     }
 
   browse_cb_info->mafw_browse_cb (MAFW_SOURCE (browse_cb_info->
