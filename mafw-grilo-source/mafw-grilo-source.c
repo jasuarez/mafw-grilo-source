@@ -36,6 +36,8 @@
 
 #define MAFW_GRILO_SOURCE_PLUGIN_NAME "MAFW-Grilo-Source"
 
+#define MAX_COUNT 1024
+
 
 G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 
