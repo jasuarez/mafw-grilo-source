@@ -36,8 +36,6 @@
 
 #define MAFW_GRILO_SOURCE_PLUGIN_NAME "MAFW-Grilo-Source"
 
-#define MAX_COUNT 1024
-
 
 G_DEFINE_TYPE (MafwGriloSource, mafw_grilo_source, MAFW_TYPE_SOURCE);
 
@@ -920,7 +918,7 @@ mafw_grilo_source_browse (MafwSource *source,
                              grl_media,
                              grl_keys,
                              skip_count,
-                             MAX_COUNT,
+                             G_MAXINT,
                              GRL_RESOLVE_IDLE_RELAY |
                              browse_cb_info->mafw_grilo_source->priv->
                              browse_metadata_mode,
