@@ -87,7 +87,6 @@ typedef struct
   gpointer mafw_user_data;
   guint mafw_browse_id;
   guint grl_browse_id;
-  guint index;
   guint item_count;
   gint total_items;
   gboolean more_pages;
