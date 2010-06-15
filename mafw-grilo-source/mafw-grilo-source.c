@@ -25,6 +25,7 @@
 #include <glib.h>
 #include <gmodule.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <libmafw/mafw.h>
 #include <grilo.h>
