@@ -809,6 +809,41 @@ get_next_row_metadata_keys (void)
   return keys;
 }
 
+static gboolean
+add_next_page_row (gpointer user_data)
+{
+  BrowseCbInfo *browse_cb_info = user_data;
+  gchar *object_id;
+  GHashTable *mafw_metadata_keys;
+
+  object_id =
+    grl_media_serialize (browse_cb_info->grl_media,
+                         mafw_extension_get_uuid (MAFW_EXTENSION (browse_cb_info->mafw_grilo_source)),
+                         browse_cb_info->pagination_skip);
+
+  mafw_metadata_keys = get_next_row_metadata_keys ();
+
+  browse_cb_info->mafw_browse_cb (MAFW_SOURCE (browse_cb_info->
+                                               mafw_grilo_source),
+                                  browse_cb_info->mafw_browse_id, 0, 0,
+                                  object_id, mafw_metadata_keys,
+                                  browse_cb_info->mafw_user_data, NULL);
+
+  g_free (object_id);
+  if (mafw_metadata_keys)
+    {
+      g_hash_table_unref (mafw_metadata_keys);
+    }
+
+  /* we don't free the info, we just remove it from the hash table
+     and it will free it for us */
+  g_hash_table_remove (browse_cb_info->mafw_grilo_source->priv->
+                       browse_requests,
+                       &(browse_cb_info->mafw_browse_id));
+
+  return FALSE;
+}
+
 static void
 grl_browse_cb (GrlMediaSource *grl_source,
                guint grl_browse_id,
