@@ -1002,8 +1002,8 @@ mafw_grilo_source_browse (MafwSource *source,
                                                grl_source),
                              grl_media,
                              grl_keys,
-                             skip_count,
-                             item_count ? item_count : G_MAXINT,
+                             browse_cb_info->pagination_skip,
+                             MAX_COUNT,
                              GRL_RESOLVE_IDLE_RELAY |
                              browse_cb_info->mafw_grilo_source->priv->
                              browse_metadata_mode,
