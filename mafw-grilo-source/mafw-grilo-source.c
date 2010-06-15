@@ -89,6 +89,7 @@ typedef struct
   guint index;
   guint item_count;
   gint total_items;
+  GrlMedia *grl_media;
 } BrowseCbInfo;
 
 typedef struct
@@ -266,6 +267,10 @@ destroy_browse_cb_info (gpointer user_data)
   BrowseCbInfo *browse_cb_info = user_data;
 
   g_object_unref (browse_cb_info->mafw_grilo_source);
+  if (browse_cb_info->grl_media)
+    {
+      g_object_unref (browse_cb_info->grl_media);
+    }
   g_free (browse_cb_info);
 }
 
@@ -904,6 +909,8 @@ mafw_grilo_source_browse (MafwSource *source,
   browse_cb_info->item_count = item_count;
 
   grl_media = grl_media_deserialize (object_id);
+
+  browse_cb_info->grl_media = grl_media ? g_object_ref (grl_media) : NULL;
 
   grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
 
