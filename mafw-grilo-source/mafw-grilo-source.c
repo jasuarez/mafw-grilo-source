@@ -90,6 +90,7 @@ typedef struct
   guint index;
   guint item_count;
   gint total_items;
+  gboolean more_pages;
   GrlMedia *grl_media;
   guint pagination_skip;
 } BrowseCbInfo;
@@ -856,6 +857,8 @@ grl_browse_cb (GrlMediaSource *grl_source,
   gchar *mafw_object_id = NULL;
   GHashTable *mafw_metadata_keys = NULL;
 
+  browse_cb_info->more_pages |= remaining + 1 >= MAX_COUNT;
+
   if (grl_media)
     {
       const gchar *mafw_uuid;
@@ -874,8 +877,8 @@ grl_browse_cb (GrlMediaSource *grl_source,
   browse_cb_info->mafw_browse_cb (MAFW_SOURCE (browse_cb_info->
                                                mafw_grilo_source),
                                   browse_cb_info->mafw_browse_id,
-                                  remaining,
-                                  browse_cb_info->index++,
+                                  browse_cb_info->more_pages ?
+                                  remaining + 1 : remaining, 0,
                                   mafw_object_id,
                                   mafw_metadata_keys,
                                   browse_cb_info->mafw_user_data,
@@ -896,11 +899,19 @@ grl_browse_cb (GrlMediaSource *grl_source,
                      browse_cb_info->total_items);
         }
 
-      /* we don't free the info, we just remove it from the hash table
-         and it will free it for us */
-      g_hash_table_remove (browse_cb_info->mafw_grilo_source->priv->
-                           browse_requests,
-                           &(browse_cb_info->mafw_browse_id));
+      if (browse_cb_info->more_pages)
+        {
+          browse_cb_info->pagination_skip += MAX_COUNT;
+          g_idle_add (add_next_page_row, browse_cb_info);
+        }
+      else
+        {
+          /* we don't free the info, we just remove it from the hash table
+             and it will free it for us */
+          g_hash_table_remove (browse_cb_info->mafw_grilo_source->priv->
+                               browse_requests,
+                               &(browse_cb_info->mafw_browse_id));
+        }
     }
 }
 
