@@ -91,6 +91,7 @@ typedef struct
   guint item_count;
   gint total_items;
   GrlMedia *grl_media;
+  guint pagination_skip;
 } BrowseCbInfo;
 
 typedef struct
@@ -580,41 +581,67 @@ mafw_grilo_source_new (GrlMediaPlugin *grl_plugin)
                        NULL);
 }
 
-static GrlMedia *
-grl_media_deserialize (const gchar *object_id)
+static void
+grl_media_deserialize (const gchar *object_id, GrlMedia **grl_media,
+                       guint *pagination_skip)
 {
-  GrlMedia *grl_media = NULL;
   gchar *serialized_grl_media = NULL;
-  gchar *grl_media_type, *grl_media_id;
 
   if (mafw_source_split_objectid (object_id, NULL, &serialized_grl_media) &&
       serialized_grl_media[0] != '\0')
     {
+      guint skip;
+      gchar *grl_media_type;
+      gchar *ptr;
+
+      skip = strtoul (serialized_grl_media, &ptr, 10);
+
+      if (pagination_skip)
+        {
+          *pagination_skip = skip;
+        }
+
       /* We search ':' and then we convert the type in NULL terminated and
          prepare the media id */
-      grl_media_type = serialized_grl_media;
-      grl_media_id = g_strstr_len (serialized_grl_media, -1, ":");
-      grl_media_type[grl_media_id - grl_media_type] = '\0';
-      grl_media_id++;
+      grl_media_type = ptr + 1;
+      if (grl_media_type[0] != '\0')
+        {
+          gchar *grl_media_id;
 
-      grl_media = g_object_new (g_type_from_name (grl_media_type), NULL);
-      grl_media_set_id (grl_media, grl_media_id);
+          grl_media_id = g_strstr_len (grl_media_type, -1, ":");
+          grl_media_type[grl_media_id - grl_media_type] = '\0';
+          grl_media_id++;
+
+          *grl_media =
+            g_object_new (g_type_from_name (grl_media_type), NULL);
+          grl_media_set_id (*grl_media, grl_media_id);
+        }
     }
 
   g_free (serialized_grl_media);
-
-  return grl_media;
 }
 
 static gchar *
-grl_media_serialize (GrlMedia *grl_media, const gchar *source_id)
+grl_media_serialize (GrlMedia *grl_media, const gchar *source_id,
+                     guint pagination_skip)
 {
   const gchar *media_id, *type;
+  gchar *value;
 
-  type = G_OBJECT_TYPE_NAME (grl_media);
-  media_id = grl_media_get_id (grl_media);
+  if (grl_media)
+    {
+      type = G_OBJECT_TYPE_NAME (grl_media);
+      media_id = grl_media_get_id (grl_media);
 
-  return g_strconcat (source_id, "::", type, ":", media_id, NULL);
+      value = g_strdup_printf ("%s::%u:%s:%s", source_id, pagination_skip, type,
+                               media_id);
+    }
+  else
+    {
+      value = g_strdup_printf ("%s::%u:", source_id, pagination_skip);
+    }
+
+  return value;
 }
 
 static GList *
@@ -788,7 +815,7 @@ grl_browse_cb (GrlMediaSource *grl_source,
                                                            mafw_grilo_source));
 
       mafw_object_id =
-        grl_media_serialize (grl_media, mafw_uuid);
+        grl_media_serialize (grl_media, mafw_uuid, 0);
       mafw_metadata_keys = mafw_keys_from_grl_media (browse_cb_info->
                                                      mafw_grilo_source,
                                                      grl_media);
@@ -894,7 +921,7 @@ mafw_grilo_source_browse (MafwSource *source,
                           MafwSourceBrowseResultCb browse_cb,
                           gpointer user_data)
 {
-  GrlMedia *grl_media;
+  GrlMedia *grl_media = NULL;
   BrowseCbInfo *browse_cb_info;
   GList *grl_keys;
 
@@ -909,7 +936,8 @@ mafw_grilo_source_browse (MafwSource *source,
     browse_cb_info->mafw_grilo_source->priv->next_browse_id++;
   browse_cb_info->item_count = item_count;
 
-  grl_media = grl_media_deserialize (object_id);
+  grl_media_deserialize (object_id, &grl_media,
+                         &(browse_cb_info->pagination_skip));
 
   browse_cb_info->grl_media = grl_media ? g_object_ref (grl_media) : NULL;
 
@@ -979,7 +1007,7 @@ mafw_grilo_source_get_metadata (MafwSource *source,
                                 gpointer user_data)
 {
   MetadataCbInfo *metadata_cb_info;
-  GrlMedia *grl_media;
+  GrlMedia *grl_media = NULL;
   GList *grl_keys;
   GrlSupportedOps supported_ops;
 
@@ -992,7 +1020,7 @@ mafw_grilo_source_get_metadata (MafwSource *source,
   metadata_cb_info->mafw_user_data = user_data;
   metadata_cb_info->mafw_object_id = g_strdup (object_id);
 
-  grl_media = grl_media_deserialize (object_id);
+  grl_media_deserialize (object_id, &grl_media, NULL);
   grl_keys = mafw_keys_to_grl_keys (MAFW_GRILO_SOURCE (source), metadata_keys);
 
   supported_ops =
