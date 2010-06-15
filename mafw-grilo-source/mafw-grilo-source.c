@@ -795,6 +795,20 @@ mafw_keys_from_grl_media (MafwGriloSource *mafw_source, GrlMedia *grl_media)
   return mafw_metadata_keys;
 }
 
+static GHashTable *
+get_next_row_metadata_keys (void)
+{
+  GHashTable *keys;
+
+  keys = mafw_metadata_new ();
+
+  mafw_metadata_add_str (keys, MAFW_METADATA_KEY_TITLE, "More results...");
+  mafw_metadata_add_str (keys, MAFW_METADATA_KEY_MIME,
+                         MAFW_METADATA_VALUE_MIME_CONTAINER);
+
+  return keys;
+}
+
 static void
 grl_browse_cb (GrlMediaSource *grl_source,
                guint grl_browse_id,
