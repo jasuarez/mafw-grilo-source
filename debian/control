@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Xabier Rodriguez Calvar <xrcalvar@igalia.com>
 Build-Depends: debhelper (>= 4.0.0),
-	       libglib2.0-dev, libmafw0-dev, libgrilo-0.1-dev (>= 0.1.4-1)
+	       libglib2.0-dev, libmafw0-dev, libgrilo-0.1-dev (>= 0.1.4-1fremantle1)
 Standards-Version: 3.7.2
 XB-Homepage: http://gitorious.org/grilo/mafw-grilo-source
 
@@ -11,7 +11,7 @@ Package: mafw-grilo-source
 Section: user/multimedia
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer0.10-flv,
-         gstreamer0.10-ffmpeg, grilo-0.1-plugins (>= 0.1.4-1fremantle1)
+         gstreamer0.10-ffmpeg, grilo-0.1-plugins (>= 0.1.4-1fremantle3)
 Description: MAFW Grilo source plugin
  This MAFW plugin provides contents gathered by Grilo with MAFW
  interface. Currently, grilo-0.1-plugins provides:
